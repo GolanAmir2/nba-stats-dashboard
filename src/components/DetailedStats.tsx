@@ -4,6 +4,10 @@ import { useStats } from '@/context/StatsContext';
 
 type StatType = 'points' | 'assists' | 'rebounds' | 'plusMinus';
 
+type StatLabelsType = {
+  [K in StatType]: string;
+};
+
 type StatsResultType = {
   lastFiveAvg: string;
   highestValue: number;

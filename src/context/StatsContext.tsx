@@ -22,7 +22,7 @@ type StatsContextType = {
   setSelectedStat: (stat: StatType) => void;
   selectedPlayerId: string | null;
   setSelectedPlayerId: (id: string) => void;
-  fetchPlayerStats: (playerId: string) => Promise<void>;
+  fetchPlayerStats: (playerId: string, year: string) => Promise<void>;
 };
 
 const StatsContext = createContext<StatsContextType | undefined>(undefined);
@@ -33,10 +33,10 @@ export function StatsProvider({ children }: { children: ReactNode }) {
   const [selectedStat, setSelectedStat] = useState<StatType>('points');
   const [selectedPlayerId, setSelectedPlayerId] = useState<string | null>(null);
 
-  const fetchPlayerStats = async (playerId: string) => {
+  const fetchPlayerStats = async (playerId: string, year: string) => {
     setIsLoading(true);
     try {
-      const response = await fetch(`/api/stats?playerId=${playerId}`);
+      const response = await fetch(`/api/stats?playerId=${playerId}&season=${year ?? '2024-25'}`);
       const data = await response.json();
       setGameData(data);
     } catch (error) {

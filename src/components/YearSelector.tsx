@@ -9,7 +9,7 @@ export default function YearSelector() {
 
   const handleYearChange = (year: string) => {
     if (selectedPlayerId) {
-      fetchPlayerStats(selectedPlayerId);
+      fetchPlayerStats(selectedPlayerId, year);
     }
   };
 
