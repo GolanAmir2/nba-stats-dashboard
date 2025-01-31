@@ -5,9 +5,7 @@ import StatSelector from '@/components/StatSelector';
 import YearSelector from '@/components/YearSelector';
 import StatsChart from '@/components/StatsChart';
 import DetailedStats from '@/components/DetailedStats';
-import CareerHighs from '@/components/CareerHighs';
 import SeasonStats from '@/components/SeasonStats';
-import Streaks from '@/components/Streaks';
 import { useStats } from '@/context/StatsContext';
 import { useEffect } from 'react';
 
@@ -31,10 +29,6 @@ export default function Home() {
       <div className="grid grid-cols-1 gap-8">
         <StatsChart />
         <DetailedStats />
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <CareerHighs />
-          <Streaks />
-        </div>
         <SeasonStats />
       </div>
     </main>
