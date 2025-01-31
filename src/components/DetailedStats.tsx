@@ -4,34 +4,12 @@ import { useStats } from '@/context/StatsContext';
 
 type StatType = 'points' | 'assists' | 'rebounds' | 'plusMinus';
 
-type StatLabelsType = {
-  [K in StatType]: string;
-};
-
-type GameDataType = {
-  date: string;
-  points: number;
-  assists: number;
-  rebounds: number;
-  plusMinus: number;
-  opponent: string;
-  isHome: boolean;
-  result: string;
-};
-
 type StatsResultType = {
   lastFiveAvg: string;
   highestValue: number;
   gamesPlayed: number;
   gamesAboveThreshold: number;
   threshold: number;
-};
-
-const statLabels: StatLabelsType = {
-  points: 'Points',
-  assists: 'Assists',
-  rebounds: 'Rebounds',
-  plusMinus: 'Plus/Minus'
 };
 
 export default function DetailedStats() {

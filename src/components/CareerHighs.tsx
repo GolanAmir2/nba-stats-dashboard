@@ -2,6 +2,17 @@
 
 import { useStats } from '@/context/StatsContext';
 
+type GameDataType = {
+  date: string;
+  points: number;
+  assists: number;
+  rebounds: number;
+  plusMinus: number;
+  opponent: string;
+  isHome: boolean;
+  result: string;
+};
+
 export default function CareerHighs() {
   const { gameData, selectedStat } = useStats();
 
@@ -9,12 +20,12 @@ export default function CareerHighs() {
 
   const getCareerHigh = () => {
     const highestGame = [...gameData].sort((a, b) => 
-      (b[selectedStat as keyof typeof b] as number) - 
-      (a[selectedStat as keyof typeof a] as number)
+      (b[selectedStat as keyof GameDataType] as number) - 
+      (a[selectedStat as keyof GameDataType] as number)
     )[0];
 
     return {
-      value: highestGame[selectedStat as keyof typeof highestGame],
+      value: highestGame[selectedStat as keyof GameDataType],
       date: highestGame.date,
       opponent: highestGame.opponent,
       result: highestGame.result

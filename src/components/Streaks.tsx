@@ -2,6 +2,17 @@
 
 import { useStats } from '@/context/StatsContext';
 
+type GameDataType = {
+  date: string;
+  points: number;
+  assists: number;
+  rebounds: number;
+  plusMinus: number;
+  opponent: string;
+  isHome: boolean;
+  result: string;
+};
+
 export default function Streaks() {
   const { gameData, selectedStat } = useStats();
 
@@ -16,7 +27,7 @@ export default function Streaks() {
 
     // Calculate current streak
     for (let i = 0; i < gameData.length; i++) {
-      if ((gameData[i][selectedStat as keyof typeof gameData[i]] as number) >= threshold) {
+      if ((gameData[i][selectedStat as keyof GameDataType] as number) >= threshold) {
         currentStreak++;
       } else {
         break;
@@ -26,7 +37,7 @@ export default function Streaks() {
     // Calculate longest streak
     let tempStreak = 0;
     for (let i = 0; i < gameData.length; i++) {
-      if ((gameData[i][selectedStat as keyof typeof gameData[i]] as number) >= threshold) {
+      if ((gameData[i][selectedStat as keyof GameDataType] as number) >= threshold) {
         tempStreak++;
         longestStreak = Math.max(longestStreak, tempStreak);
       } else {

@@ -1,12 +1,13 @@
 'use client';
 
 import { useStats } from '@/context/StatsContext';
+import type { StatType } from '@/context/StatsContext';
 
-const statOptions = [
+const stats: { value: StatType; label: string }[] = [
   { value: 'points', label: 'Points' },
   { value: 'assists', label: 'Assists' },
   { value: 'rebounds', label: 'Rebounds' },
-  { value: 'plusMinus', label: 'Plus/Minus' },
+  { value: 'plusMinus', label: 'Plus/Minus' }
 ];
 
 export default function StatSelector() {
@@ -15,12 +16,12 @@ export default function StatSelector() {
   return (
     <select
       value={selectedStat}
-      onChange={(e) => setSelectedStat(e.target.value)}
-      className="block w-40 px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+      onChange={(e) => setSelectedStat(e.target.value as StatType)}
+      className="p-2 border rounded-lg"
     >
-      {statOptions.map((option) => (
-        <option key={option.value} value={option.value}>
-          {option.label}
+      {stats.map(stat => (
+        <option key={stat.value} value={stat.value}>
+          {stat.label}
         </option>
       ))}
     </select>

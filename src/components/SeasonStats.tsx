@@ -1,61 +1,47 @@
 'use client';
 
 import { useStats } from '@/context/StatsContext';
-import LoadingSpinner from './LoadingSpinner';
-
-const statLabels = {
-  points: 'Points',
-  assists: 'Assists',
-  rebounds: 'Rebounds',
-  plusMinus: 'Plus/Minus'
-};
 
 export default function SeasonStats() {
-  const { gameData, selectedYear, isLoading, selectedStat } = useStats();
+  const { gameData, selectedStat, isLoading } = useStats();
 
-  if (isLoading) {
-    return <LoadingSpinner />;
-  }
+  if (isLoading || !gameData.length) return null;
 
-  if (!gameData.length) {
-    return (
-      <div className="bg-white p-4 rounded-lg shadow-sm border mb-4">
-        <p className="text-center text-gray-500">No stats available for this season</p>
-      </div>
-    );
-  }
+  const calculateSeasonStats = () => {
+    const total = gameData.reduce((sum, game) => sum + game[selectedStat], 0);
+    const average = total / gameData.length;
+    const wins = gameData.filter(game => game.result === 'W').length;
+    const losses = gameData.length - wins;
 
-  // Calculate season average for selected stat
-  const totalStats = gameData.reduce((sum, game) => sum + (game[selectedStat as keyof typeof game] as number), 0);
-  const averageStats = (totalStats / gameData.length).toFixed(1);
+    return {
+      total: total.toFixed(0),
+      average: average.toFixed(1),
+      wins,
+      losses
+    };
+  };
 
-  // Calculate home/away splits
-  const homeGames = gameData.filter(game => game.isHome === true);
-  const awayGames = gameData.filter(game => game.isHome === false);
-  
-  const homeAverage = homeGames.length > 0
-    ? (homeGames.reduce((sum, game) => sum + (game[selectedStat as keyof typeof game] as number), 0) / homeGames.length).toFixed(1)
-    : 'N/A';
-    
-  const awayAverage = awayGames.length > 0
-    ? (awayGames.reduce((sum, game) => sum + (game[selectedStat as keyof typeof game] as number), 0) / awayGames.length).toFixed(1)
-    : 'N/A';
+  const stats = calculateSeasonStats();
 
   return (
     <div className="bg-white p-4 rounded-lg shadow-sm border mb-4">
-      <h2 className="text-lg font-bold mb-2">{selectedYear} Season {statLabels[selectedStat as keyof typeof statLabels]}</h2>
-      <div className="grid grid-cols-3 gap-4">
-        <div className="text-center">
-          <p className="text-sm text-gray-600">Season Average</p>
-          <p className="text-xl font-bold">{averageStats}</p>
+      <h2 className="text-lg font-bold mb-4">Season Statistics</h2>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="text-center p-3 bg-gray-50 rounded">
+          <p className="text-sm text-gray-600">Total</p>
+          <p className="text-xl font-bold">{stats.total}</p>
         </div>
-        <div className="text-center">
-          <p className="text-sm text-gray-600">Home Average</p>
-          <p className="text-xl font-bold text-red-600">{homeAverage}</p>
+        <div className="text-center p-3 bg-gray-50 rounded">
+          <p className="text-sm text-gray-600">Average</p>
+          <p className="text-xl font-bold">{stats.average}</p>
         </div>
-        <div className="text-center">
-          <p className="text-sm text-gray-600">Away Average</p>
-          <p className="text-xl font-bold text-yellow-500">{awayAverage}</p>
+        <div className="text-center p-3 bg-gray-50 rounded">
+          <p className="text-sm text-gray-600">Wins</p>
+          <p className="text-xl font-bold">{stats.wins}</p>
+        </div>
+        <div className="text-center p-3 bg-gray-50 rounded">
+          <p className="text-sm text-gray-600">Losses</p>
+          <p className="text-xl font-bold">{stats.losses}</p>
         </div>
       </div>
     </div>

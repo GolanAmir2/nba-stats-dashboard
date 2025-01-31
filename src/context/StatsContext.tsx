@@ -1,8 +1,10 @@
 'use client';
 
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { createContext, useContext, useState, ReactNode } from 'react';
 
-type GameStats = {
+export type StatType = 'points' | 'assists' | 'rebounds' | 'plusMinus';
+
+export type GameDataType = {
   date: string;
   points: number;
   assists: number;
@@ -10,53 +12,51 @@ type GameStats = {
   plusMinus: number;
   opponent: string;
   isHome: boolean;
+  result: string;
 };
 
 type StatsContextType = {
-  gameData: GameStats[];
-  selectedYear: string;
-  setSelectedYear: (year: string) => void;
-  selectedStat: string;
-  setSelectedStat: (stat: string) => void;
+  gameData: GameDataType[];
   isLoading: boolean;
+  selectedStat: StatType;
+  setSelectedStat: (stat: StatType) => void;
+  selectedPlayerId: string | null;
+  setSelectedPlayerId: (id: string) => void;
+  fetchPlayerStats: (playerId: string) => Promise<void>;
 };
 
 const StatsContext = createContext<StatsContextType | undefined>(undefined);
 
 export function StatsProvider({ children }: { children: ReactNode }) {
-  const [gameData, setGameData] = useState<GameStats[]>([]);
-  const [selectedYear, setSelectedYear] = useState('2024-25');
-  const [selectedStat, setSelectedStat] = useState('points');
+  const [gameData, setGameData] = useState<GameDataType[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedStat, setSelectedStat] = useState<StatType>('points');
+  const [selectedPlayerId, setSelectedPlayerId] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchStats = async () => {
-      setIsLoading(true);
-      try {
-        // Deni's player ID is hardcoded
-        const response = await fetch(`/api/stats?playerId=1630166&season=${selectedYear}`);
-        const data = await response.json();
-        setGameData(data);
-      } catch (error) {
-        console.error('Error fetching stats:', error);
-        setGameData([]);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchStats();
-  }, [selectedYear]);
+  const fetchPlayerStats = async (playerId: string) => {
+    setIsLoading(true);
+    try {
+      const response = await fetch(`/api/stats?playerId=${playerId}`);
+      const data = await response.json();
+      setGameData(data);
+    } catch (error) {
+      console.error('Error fetching stats:', error);
+      setGameData([]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <StatsContext.Provider 
-      value={{ 
-        gameData, 
-        selectedYear, 
-        setSelectedYear, 
+      value={{
+        gameData,
+        isLoading,
         selectedStat,
         setSelectedStat,
-        isLoading 
+        selectedPlayerId,
+        setSelectedPlayerId,
+        fetchPlayerStats,
       }}
     >
       {children}

@@ -12,7 +12,7 @@ import {
   Tooltip,
   Legend,
   ChartData,
-  ChartOptions
+  ChartOptions,
 } from 'chart.js';
 
 ChartJS.register(
@@ -25,8 +25,21 @@ ChartJS.register(
   Legend,
 );
 
+type StatType = 'points' | 'assists' | 'rebounds' | 'plusMinus';
+
 type StatLabelsType = {
-  [key: string]: string;
+  [K in StatType]: string;
+};
+
+type GameDataType = {
+  date: string;
+  points: number;
+  assists: number;
+  rebounds: number;
+  plusMinus: number;
+  opponent: string;
+  isHome: boolean;
+  result: string;
 };
 
 const statLabels: StatLabelsType = {
@@ -41,15 +54,14 @@ export default function StatsChart() {
 
   if (isLoading || !gameData.length) return null;
 
-  // Reverse the game data array to show oldest games first
   const reversedGameData = [...gameData].reverse();
 
   const chartData: ChartData<'line'> = {
     labels: reversedGameData.map(game => game.date),
     datasets: [
       {
-        label: statLabels[selectedStat],
-        data: reversedGameData.map(game => game[selectedStat as keyof typeof game] as number),
+        label: statLabels[selectedStat as StatType],
+        data: reversedGameData.map(game => game[selectedStat as keyof GameDataType] as number),
         borderColor: 'rgb(0, 0, 0)',
         backgroundColor: reversedGameData.map(game => 
           game.result === 'W' ? 'rgb(34, 197, 94)' : 'rgb(239, 68, 68)'
@@ -71,20 +83,20 @@ export default function StatsChart() {
       },
       title: {
         display: true,
-        text: `${statLabels[selectedStat]} by Game`,
+        text: `${statLabels[selectedStat as StatType]} by Game`,
       },
       tooltip: {
         callbacks: {
           label: function(context: { dataIndex: number }) {
             const gameIndex = context.dataIndex;
             const game = reversedGameData[gameIndex];
-            const statValue = game[selectedStat as keyof typeof game];
+            const statValue = game[selectedStat as keyof GameDataType];
             const location = game.isHome ? 'Home' : 'Away';
             const opponent = game.opponent;
             const result = game.result;
             return [
               `${location} vs ${opponent} (${result})`,
-              `${statLabels[selectedStat]}: ${statValue}`
+              `${statLabels[selectedStat as StatType]}: ${statValue}`
             ];
           }
         }
