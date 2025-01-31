@@ -7,9 +7,9 @@ type Player = {
   teamName: string;
 };
 
-type NBAResponse = {
+type NBAPlayerData = {
   resultSets: [{
-    rowSet: any[][];
+    rowSet: [string | number, string | number, string, string, string, string, string, string, string][];
   }];
 };
 
@@ -31,16 +31,16 @@ export async function GET(request: Request) {
       throw new Error('Failed to fetch players');
     }
 
-    const data: NBAResponse = await response.json();
+    const data: NBAPlayerData = await response.json();
     const players: Player[] = data.resultSets[0].rowSet
-      .filter((player: any[]) => 
-        player[2].toLowerCase().includes(query.toLowerCase())
+      .filter((player) => 
+        player[2].toString().toLowerCase().includes(query.toLowerCase())
       )
-      .map((player: any[]) => ({
-        id: player[0],
-        name: player[2],
-        teamId: player[7],
-        teamName: player[8]
+      .map((player) => ({
+        id: player[0].toString(),
+        name: player[2].toString(),
+        teamId: player[7].toString(),
+        teamName: player[8].toString()
       }));
 
     return NextResponse.json(players);

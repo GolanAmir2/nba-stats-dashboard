@@ -75,7 +75,7 @@ export default function StatsChart() {
       },
       tooltip: {
         callbacks: {
-          label: function(context: any) {
+          label: function(context: { dataIndex: number }) {
             const gameIndex = context.dataIndex;
             const game = reversedGameData[gameIndex];
             const statValue = game[selectedStat as keyof typeof game];

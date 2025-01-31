@@ -11,9 +11,9 @@ type GameData = {
   result: string;
 };
 
-type NBAResponse = {
+type NBAGameData = {
   resultSets: [{
-    rowSet: any[][];
+    rowSet: [string | number, string | number, string, string, string, string, number, number, number, number, number, number, number, number, number, number, number, number, number, number, number, number, number, number, number, number][];
   }];
 };
 
@@ -46,42 +46,25 @@ export async function GET(request: Request) {
       throw new Error('Failed to fetch stats');
     }
 
-    const data = await response.json();
+    const data: NBAGameData = await response.json();
     
-    // Log the headers to verify indices
-    if (data.resultSets?.[0]?.headers) {
-      console.log('API Headers:', data.resultSets[0].headers);
-    }
-    
-    const games: GameData[] = data.resultSets[0].rowSet.map((game: any[]) => {
-      const matchup = game[4] || '';
+    const games: GameData[] = data.resultSets[0].rowSet.map((game) => {
+      const matchup = game[4].toString() || '';
       const isHome = matchup.includes('vs.');
       
       const defensiveRebounds = Number(game[17]) || 0;
       const offensiveRebounds = Number(game[16]) || 0;
       const totalRebounds = defensiveRebounds + offensiveRebounds;
 
-      // Log first game data for verification
-      if (game === data.resultSets[0].rowSet[0]) {
-        console.log('First game raw data:', {
-          date: game[3],
-          matchup: game[4],
-          assists: game[19],
-          points: game[24],
-          rebounds: totalRebounds,
-          plusMinus: game[25] // PLUS_MINUS at index 25
-        });
-      }
-
       return {
-        date: game[3],
+        date: game[3].toString(),
         points: Number(game[24]) || 0,
         assists: Number(game[19]) || 0,
         rebounds: totalRebounds,
         plusMinus: Number(game[25]) || 0,
         opponent: isHome ? matchup.split('vs.')[1]?.trim() : matchup.split('@')[1]?.trim(),
         isHome,
-        result: game[5]
+        result: game[5].toString()
       };
     });
 
