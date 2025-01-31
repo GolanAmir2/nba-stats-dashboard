@@ -16,7 +16,7 @@ export default function Home() {
   useEffect(() => {
     const deniId = '1630166';  // Deni Avdija's NBA ID
     setSelectedPlayerId(deniId);
-    fetchPlayerStats(deniId);
+    fetchPlayerStats(deniId, '2024-25');
   }, []);
 
   return (
