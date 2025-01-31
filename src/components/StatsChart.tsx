@@ -1,0 +1,125 @@
+'use client';
+
+import { useStats } from '@/context/StatsContext';
+import { Line } from 'react-chartjs-2';
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+} from 'chart.js';
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+);
+
+const statLabels = {
+  points: 'Points',
+  assists: 'Assists',
+  rebounds: 'Rebounds',
+  plusMinus: 'Plus/Minus'
+};
+
+export default function StatsChart() {
+  const { gameData, selectedStat, isLoading } = useStats();
+
+  if (isLoading || !gameData.length) return null;
+
+  // Reverse the game data array to show oldest games first
+  const reversedGameData = [...gameData].reverse();
+
+  const chartData = {
+    labels: reversedGameData.map(game => game.date),
+    datasets: [
+      {
+        label: statLabels[selectedStat as keyof typeof statLabels],
+        data: reversedGameData.map(game => game[selectedStat as keyof typeof game] as number),
+        borderColor: 'rgb(0, 0, 0)',
+        backgroundColor: reversedGameData.map(game => 
+          game.result === 'W' ? 'rgb(34, 197, 94)' : 'rgb(239, 68, 68)'
+        ),
+        pointRadius: 8,
+        pointStyle: reversedGameData.map(game => 
+          game.isHome ? 'circle' : 'rectRot'
+        ),
+        borderWidth: 1,
+      }
+    ]
+  };
+
+  const options = {
+    responsive: true,
+    plugins: {
+      legend: {
+        display: false,
+      },
+      title: {
+        display: true,
+        text: `${statLabels[selectedStat as keyof typeof statLabels]} by Game`,
+      },
+      tooltip: {
+        callbacks: {
+          label: function(context: any) {
+            const gameIndex = context.dataIndex;
+            const game = reversedGameData[gameIndex];
+            const statValue = game[selectedStat as keyof typeof game];
+            const location = game.isHome ? 'Home' : 'Away';
+            const opponent = game.opponent;
+            const result = game.result;
+            return [
+              `${location} vs ${opponent} (${result})`,
+              `${statLabels[selectedStat as keyof typeof statLabels]}: ${statValue}`
+            ];
+          }
+        }
+      }
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        ticks: {
+          stepSize: selectedStat === 'plusMinus' ? 5 : 2,
+        }
+      }
+    }
+  };
+
+  return (
+    <div className="bg-white p-4 rounded-lg shadow-sm border">
+      <div className="flex justify-center items-center gap-8 mb-6 text-lg">
+        <div className="flex items-center gap-8">
+          <div className="flex items-center gap-2">
+            <div className="w-4 h-4 rounded-full bg-black"></div>
+            <span>Home</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-4 h-4 bg-black transform rotate-45"></div>
+            <span>Away</span>
+          </div>
+        </div>
+        <div className="h-6 w-px bg-gray-300 mx-4"></div>
+        <div className="flex items-center gap-8">
+          <div className="flex items-center gap-2">
+            <div className="w-4 h-4 rounded-full bg-green-500"></div>
+            <span>Win</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-4 h-4 rounded-full bg-red-500"></div>
+            <span>Loss</span>
+          </div>
+        </div>
+      </div>
+      <Line options={options} data={chartData} />
+    </div>
+  );
+} 
