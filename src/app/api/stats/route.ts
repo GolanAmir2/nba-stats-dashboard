@@ -1,5 +1,16 @@
 import { NextResponse } from 'next/server';
 
+type GameData = {
+  date: string;
+  points: number;
+  assists: number;
+  rebounds: number;
+  plusMinus: number;
+  opponent: string;
+  isHome: boolean;
+  result: string;
+};
+
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const season = searchParams.get('season') || '2024-25';
@@ -36,12 +47,10 @@ export async function GET(request: Request) {
       console.log('API Headers:', data.resultSets[0].headers);
     }
     
-    const games = data.resultSets[0].rowSet.map((game: any) => {
+    const games: GameData[] = data.resultSets[0].rowSet.map((game: any[]) => {
       const matchup = game[4] || '';
       const isHome = matchup.includes('vs.');
-      const wl = game[5]; // WL column
       
-      // Updated indices based on the NBA API response
       const defensiveRebounds = Number(game[17]) || 0;
       const offensiveRebounds = Number(game[16]) || 0;
       const totalRebounds = defensiveRebounds + offensiveRebounds;
@@ -63,10 +72,10 @@ export async function GET(request: Request) {
         points: Number(game[24]) || 0,
         assists: Number(game[19]) || 0,
         rebounds: totalRebounds,
-        plusMinus: Number(game[25]) || 0, // Changed from 27 to 25
+        plusMinus: Number(game[25]) || 0,
         opponent: isHome ? matchup.split('vs.')[1]?.trim() : matchup.split('@')[1]?.trim(),
         isHome,
-        result: wl
+        result: game[5]
       };
     });
 

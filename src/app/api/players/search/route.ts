@@ -1,57 +1,47 @@
 import { NextResponse } from 'next/server';
 
+type Player = {
+  id: string;
+  name: string;
+  teamId: string;
+  teamName: string;
+};
+
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
-  const searchTerm = searchParams.get('name')?.toLowerCase() || '';
+  const query = searchParams.get('q');
 
-  if (!searchTerm || searchTerm.length < 2) {
-    return NextResponse.json([]);
+  if (!query) {
+    return NextResponse.json(
+      { error: 'Search query is required' },
+      { status: 400 }
+    );
   }
 
   try {
-    // Using stats.nba.com API instead of data.nba.net
-    const url = 'https://stats.nba.com/stats/playerindex?Historical=0&LeagueID=00';
+    const response = await fetch(`https://stats.nba.com/stats/playerindex?Historical=0&LeagueID=00&Season=2023-24`);
     
-    const response = await fetch(url, {
-      headers: {
-        'Accept': '*/*',
-        'Accept-Language': 'en-US,en;q=0.9',
-        'Host': 'stats.nba.com',
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
-        'Referer': 'https://www.nba.com/',
-        'Origin': 'https://www.nba.com',
-        'x-nba-stats-origin': 'stats',
-        'x-nba-stats-token': 'true',
-      },
-      next: { revalidate: 3600 } // Cache for 1 hour
-    });
-
     if (!response.ok) {
-      throw new Error(`NBA API error: ${response.status} ${response.statusText}`);
+      throw new Error('Failed to fetch players');
     }
 
     const data = await response.json();
-    
-    // Process the NBA API response
-    const players = data.resultSets[0].rowSet
-      .filter((player: any[]) => {
-        const fullName = `${player[1]}`.toLowerCase();
-        return fullName.includes(searchTerm);
-      })
+    const players: Player[] = data.resultSets[0].rowSet
+      .filter((player: any[]) => 
+        player[2].toLowerCase().includes(query.toLowerCase())
+      )
       .map((player: any[]) => ({
         id: player[0],
-        name: player[1],
-        teamName: player[8] || 'N/A'  // TEAM_NAME is usually at index 8
-      }))
-      .slice(0, 10);
+        name: player[2],
+        teamId: player[7],
+        teamName: player[8]
+      }));
 
-    console.log(`Found ${players.length} players matching "${searchTerm}"`);
-    
     return NextResponse.json(players);
   } catch (error) {
-    console.error('Error searching players:', error);
+    console.error('Error:', error);
     return NextResponse.json(
-      { error: 'Failed to search players' },
+      { error: 'Failed to fetch players' },
       { status: 500 }
     );
   }
