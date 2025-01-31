@@ -2,11 +2,11 @@
 
 import { useStats } from '@/context/StatsContext';
 
-type StatLabels = {
+type StatLabelsType = {
   [key: string]: string;
 };
 
-const statLabels: StatLabels = {
+const statLabels: StatLabelsType = {
   points: 'Points',
   assists: 'Assists',
   rebounds: 'Rebounds',

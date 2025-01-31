@@ -11,6 +11,8 @@ import {
   Title,
   Tooltip,
   Legend,
+  ChartData,
+  ChartOptions
 } from 'chart.js';
 
 ChartJS.register(
@@ -23,7 +25,11 @@ ChartJS.register(
   Legend,
 );
 
-const statLabels = {
+type StatLabelsType = {
+  [key: string]: string;
+};
+
+const statLabels: StatLabelsType = {
   points: 'Points',
   assists: 'Assists',
   rebounds: 'Rebounds',
@@ -38,11 +44,11 @@ export default function StatsChart() {
   // Reverse the game data array to show oldest games first
   const reversedGameData = [...gameData].reverse();
 
-  const chartData = {
+  const chartData: ChartData<'line'> = {
     labels: reversedGameData.map(game => game.date),
     datasets: [
       {
-        label: statLabels[selectedStat as keyof typeof statLabels],
+        label: statLabels[selectedStat],
         data: reversedGameData.map(game => game[selectedStat as keyof typeof game] as number),
         borderColor: 'rgb(0, 0, 0)',
         backgroundColor: reversedGameData.map(game => 
@@ -57,7 +63,7 @@ export default function StatsChart() {
     ]
   };
 
-  const options = {
+  const options: ChartOptions<'line'> = {
     responsive: true,
     plugins: {
       legend: {
@@ -65,7 +71,7 @@ export default function StatsChart() {
       },
       title: {
         display: true,
-        text: `${statLabels[selectedStat as keyof typeof statLabels]} by Game`,
+        text: `${statLabels[selectedStat]} by Game`,
       },
       tooltip: {
         callbacks: {
@@ -78,7 +84,7 @@ export default function StatsChart() {
             const result = game.result;
             return [
               `${location} vs ${opponent} (${result})`,
-              `${statLabels[selectedStat as keyof typeof statLabels]}: ${statValue}`
+              `${statLabels[selectedStat]}: ${statValue}`
             ];
           }
         }

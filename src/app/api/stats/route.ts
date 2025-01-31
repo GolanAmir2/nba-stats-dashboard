@@ -11,6 +11,12 @@ type GameData = {
   result: string;
 };
 
+type NBAResponse = {
+  resultSets: [{
+    rowSet: any[][];
+  }];
+};
+
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const season = searchParams.get('season') || '2024-25';

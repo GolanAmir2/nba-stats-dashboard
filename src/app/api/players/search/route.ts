@@ -7,6 +7,12 @@ type Player = {
   teamName: string;
 };
 
+type NBAResponse = {
+  resultSets: [{
+    rowSet: any[][];
+  }];
+};
+
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const query = searchParams.get('q');
@@ -25,7 +31,7 @@ export async function GET(request: Request) {
       throw new Error('Failed to fetch players');
     }
 
-    const data = await response.json();
+    const data: NBAResponse = await response.json();
     const players: Player[] = data.resultSets[0].rowSet
       .filter((player: any[]) => 
         player[2].toLowerCase().includes(query.toLowerCase())
