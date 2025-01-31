@@ -2,8 +2,29 @@
 
 import { useStats } from '@/context/StatsContext';
 
+type StatType = 'points' | 'assists' | 'rebounds' | 'plusMinus';
+
 type StatLabelsType = {
-  [key: string]: string;
+  [K in StatType]: string;
+};
+
+type GameDataType = {
+  date: string;
+  points: number;
+  assists: number;
+  rebounds: number;
+  plusMinus: number;
+  opponent: string;
+  isHome: boolean;
+  result: string;
+};
+
+type StatsResultType = {
+  lastFiveAvg: string;
+  highestValue: number;
+  gamesPlayed: number;
+  gamesAboveThreshold: number;
+  threshold: number;
 };
 
 const statLabels: StatLabelsType = {
@@ -18,18 +39,17 @@ export default function DetailedStats() {
 
   if (isLoading || !gameData.length) return null;
 
-  const calculateStats = () => {
+  const calculateStats = (): StatsResultType => {
     const lastFiveGames = gameData.slice(0, 5);
     const lastFiveAvg = lastFiveGames.reduce((sum, game) => 
-      sum + (game[selectedStat as keyof typeof game] as number), 0) / 5;
+      sum + game[selectedStat as StatType], 0) / 5;
 
-    const allValues = gameData.map(game => game[selectedStat as keyof typeof game] as number);
+    const allValues = gameData.map(game => game[selectedStat as StatType]);
     const highestValue = Math.max(...allValues);
     const gamesPlayed = gameData.length;
 
-    // Calculate threshold based on stat type
-    let threshold;
-    switch(selectedStat) {
+    let threshold: number;
+    switch(selectedStat as StatType) {
       case 'points':
         threshold = 20;
         break;
@@ -47,7 +67,7 @@ export default function DetailedStats() {
     }
 
     const gamesAboveThreshold = gameData.filter(game => 
-      (game[selectedStat as keyof typeof game] as number) >= threshold
+      game[selectedStat as StatType] >= threshold
     ).length;
 
     return {
@@ -61,8 +81,8 @@ export default function DetailedStats() {
 
   const stats = calculateStats();
 
-  const getThresholdLabel = () => {
-    switch(selectedStat) {
+  const getThresholdLabel = (): string => {
+    switch(selectedStat as StatType) {
       case 'points':
         return 'Games Over 20';
       case 'assists':
