@@ -32,7 +32,7 @@ export default function PlayerSearch() {
 
   const handlePlayerSelect = (playerId: string) => {
     setSelectedPlayerId(playerId);
-    fetchPlayerStats(playerId);
+    fetchPlayerStats(playerId, '2024-25');
     setPlayers([]);
     setQuery('');
   };
