@@ -3,23 +3,6 @@ import { NextResponse } from 'next/server';
 export const maxDuration = 300; // Set max duration to 300 seconds
 export const dynamic = 'force-dynamic'; // Disable caching for now
 
-type GameStats = {
-  date: string;
-  opponent: string;
-  result: string;
-  isHome: boolean;
-  points: number;
-  assists: number;
-  rebounds: number;
-  plusMinus: number;
-};
-
-type NBAGameData = {
-  resultSets: [{
-    rowSet: [string | number, string | number, string, string, string, string, number, number, number, number, number, number, number, number, number, number, number, number, number, number, number, number, number, number, number, number][];
-  }];
-};
-
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
