@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 
-export const maxDuration = 300; // Set max duration to 300 seconds
-export const dynamic = 'force-dynamic'; // Disable caching for now
+export const maxDuration = 10;
+export const dynamic = 'force-dynamic';
 
 export async function GET(request: Request) {
   try {
@@ -13,9 +13,8 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: 'Player ID is required' }, { status: 400 });
     }
 
-    // Fetch data from NBA API with timeout
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+    const timeoutId = setTimeout(() => controller.abort(), 8000);
 
     const response = await fetch(
       `https://stats.nba.com/stats/playergamelog?PlayerID=${playerId}&Season=${season}&SeasonType=Regular%20Season`,
