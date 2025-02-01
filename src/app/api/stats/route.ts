@@ -43,6 +43,7 @@ export async function GET(request: Request) {
     const data = await response.json();
 
     // Transform the data into the format your frontend expects
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const games = data.resultSets[0].rowSet.map((game: any[]) => ({
       date: String(game[3]),
       opponent: String(game[5]),
