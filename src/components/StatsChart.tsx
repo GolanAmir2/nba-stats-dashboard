@@ -52,7 +52,21 @@ const statLabels: StatLabelsType = {
 export default function StatsChart() {
   const { gameData, selectedStat, isLoading } = useStats();
 
-  if (isLoading || !gameData.length) return null;
+  if (isLoading) {
+    return (
+      <div className="bg-white p-4 rounded-lg shadow-sm border flex justify-center items-center h-64">
+        <div className="text-gray-500">Loading stats...</div>
+      </div>
+    );
+  }
+
+  if (!gameData.length) {
+    return (
+      <div className="bg-white p-4 rounded-lg shadow-sm border flex justify-center items-center h-64">
+        <div className="text-gray-500">No data available</div>
+      </div>
+    );
+  }
 
   const reversedGameData = [...gameData].reverse();
 
