@@ -3,15 +3,15 @@ import { NextResponse } from 'next/server';
 export const maxDuration = 300; // Set max duration to 300 seconds
 export const dynamic = 'force-dynamic'; // Disable caching for now
 
-type GameData = {
+type GameStats = {
   date: string;
+  opponent: string;
+  result: string;
+  isHome: boolean;
   points: number;
   assists: number;
   rebounds: number;
   plusMinus: number;
-  opponent: string;
-  isHome: boolean;
-  result: string;
 };
 
 type NBAGameData = {
@@ -60,15 +60,15 @@ export async function GET(request: Request) {
     const data = await response.json();
 
     // Transform the data into the format your frontend expects
-    const games = data.resultSets[0].rowSet.map((game: any) => ({
-      date: game[3],
-      opponent: game[5],
-      result: game[4].split(' ')[0],
-      isHome: !game[5].startsWith('@'),
-      points: game[24],
-      assists: game[21],
-      rebounds: game[20],
-      plusMinus: game[27]
+    const games = data.resultSets[0].rowSet.map((game: any[]) => ({
+      date: String(game[3]),
+      opponent: String(game[5]),
+      result: String(game[4]).split(' ')[0],
+      isHome: !String(game[5]).startsWith('@'),
+      points: Number(game[24]),
+      assists: Number(game[21]),
+      rebounds: Number(game[20]),
+      plusMinus: Number(game[27])
     }));
 
     return NextResponse.json(games);

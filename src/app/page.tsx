@@ -7,17 +7,20 @@ import StatsChart from '@/components/StatsChart';
 import DetailedStats from '@/components/DetailedStats';
 import SeasonStats from '@/components/SeasonStats';
 import { useStats } from '@/context/StatsContext';
-import { useEffect } from 'react';
+import { useEffect, useCallback } from 'react';
 
 export default function Home() {
   const { setSelectedPlayerId, fetchPlayerStats } = useStats();
 
-  // Set Deni's ID and fetch his stats on initial load
-  useEffect(() => {
+  const initializePlayer = useCallback(() => {
     const deniId = '1630166';  // Deni Avdija's NBA ID
     setSelectedPlayerId(deniId);
     fetchPlayerStats(deniId, '2024-25');
-  }, []);
+  }, [setSelectedPlayerId, fetchPlayerStats]);
+
+  useEffect(() => {
+    initializePlayer();
+  }, [initializePlayer]);
 
   return (
     <main className="container mx-auto px-4 py-8">
